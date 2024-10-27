@@ -1,129 +1,131 @@
-org 0x7c00
-bits 16     ; 16 bit architecture
+ORG 0x7c00
+BITS 16
 
-CODE_SEG equ gdt_code-gdt_start
-DATA_SEG equ get_data-gdt_start
+CODE_SEG equ gdt_code - gdt_start
+DATA_SEG equ gdt_data - gdt_start
 
 _start:
-    jmp short start     ;;
-    nop                 ;;  hardware compatibility setup
-    times 33 db 0       ;;
+    jmp short start
+    nop
 
+ times 33 db 0
+ 
 start:
-    jmp 0x7c0:step2
+    jmp 0:step2
 
 step2:
-    cli                     ; clear interrupts
-    mov ax,0x00            ; segment value entry via ax reg
-    mov ds,ax               ; copying to the data segment   
-    mov es,ax               ; copying to the extra segment
-    mov ax,0x0              ; clr ax
-    mov ss,ax               ; move 0x0 to stack segment
-    mov sp,0x7c00           ; move stack ptr to address of code
-    sti                     ; setup interrupts
+    cli ; Clear Interrupts
+    mov ax, 0x00
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+    mov sp, 0x7c00
+    sti ; Enables Interrupts
 
-.load_protedted:
+.load_protected:
     cli
     lgdt[gdt_descriptor]
-    mov eax,cr0
-    or eax,0x1
-    mov cr0,eax
+    mov eax, cr0
+    or eax, 0x1
+    mov cr0, eax
     jmp CODE_SEG:load32
-
+    
+; GDT
 gdt_start:
-    gdt_null:
-        dd 0x0
-        dd 0x0
+gdt_null:
+    dd 0x0
+    dd 0x0
 
-    gdt_code:
-        dw 0xffff
-        dw 0
-        db 0
-        db 0x9a
-        db 11001111b
-        db 0
+; offset 0x8
+gdt_code:     ; CS SHOULD POINT TO THIS
+    dw 0xffff ; Segment limit first 0-15 bits
+    dw 0      ; Base first 0-15 bits
+    db 0      ; Base 16-23 bits
+    db 0x9a   ; Access byte
+    db 11001111b ; High 4 bit flags and the low 4 bit flags
+    db 0        ; Base 24-31 bits
 
-    get_data:
-        dw 0xffff
-        dw 0
-        db 0
-        db 0x92
-        db 11001111b
-        db 0
+; offset 0x10
+gdt_data:      ; DS, SS, ES, FS, GS
+    dw 0xffff ; Segment limit first 0-15 bits
+    dw 0      ; Base first 0-15 bits
+    db 0      ; Base 16-23 bits
+    db 0x92   ; Access byte
+    db 11001111b ; High 4 bit flags and the low 4 bit flags
+    db 0        ; Base 24-31 bits
 
 gdt_end:
-    gdt_descriptor:
-        dw gdt_end-gdt_start-1
-        dd gdt_start
 
-[BITS 32]
-load32:
-    mov eax,1 ; start sector to load from
-    mov ecx,100 ; total num of sectors to load
-    mov edi,0x0100000; ; address to load into    1M -> address of kernel
-    call ata_label_read ; driver for loading kernel
+gdt_descriptor:
+    dw gdt_end - gdt_start-1
+    dd gdt_start
+ 
+ [BITS 32]
+ load32:
+    mov eax, 1
+    mov ecx, 100
+    mov edi, 0x0100000
+    call ata_lba_read
     jmp CODE_SEG:0x0100000
 
+ata_lba_read:
+    mov ebx, eax, ; Backup the LBA
+    ; Send the highest 8 bits of the lba to hard disk controller
+    shr eax, 24
+    or eax, 0xE0 ; Select the  master drive
+    mov dx, 0x1F6
+    out dx, al
+    ; Finished sending the highest 8 bits of the lba
 
-ata_label_read:
-    mov ebx,eax ; backup lba
-    ; send highest 8 bits of lba to harddisk controller
-    or eax,0xE0; select master device
-    shr eax,24 ; shift eax reg by 24 bits to right so eax has highest 8 bits
-    mov dx,0x1F6
-    out dx,al
-    ; finished sending  highest 8 bits
-    
-    ; send total sectors to read
-    mov eax,ecx
-    mov dx,0xF12
-    out dx,al
-    ; finish sending total sectors to read
+    ; Send the total sectors to read
+    mov eax, ecx
+    mov dx, 0x1F2
+    out dx, al
+    ; Finished sending the total sectors to read
 
-    ; send more bits of lba 
-    mov eax,ebx ; restore backup lba
-    mov dx,0xF13
-    out dx,al
-    ; finish sending
+    ; Send more bits of the LBA
+    mov eax, ebx ; Restore the backup LBA
+    mov dx, 0x1F3
+    out dx, al
+    ; Finished sending more bits of the LBA
 
-    ; send more bits of lba
-    mov dx,0xF14
-    mov eax,ebx ; restore backup lba
-    shr eax,8
-    out dx,al
-    ; finish sending
+    ; Send more bits of the LBA
+    mov dx, 0x1F4
+    mov eax, ebx ; Restore the backup LBA
+    shr eax, 8
+    out dx, al
+    ; Finished sending more bits of the LBA
 
-    ; send upper 16 bits of lba
-    mov dx,0x1F5
-    mov eax,ebx
-    shr eax,16
-    out dx,al
-    ; finish sendiing
+    ; Send upper 16 bits of the LBA
+    mov dx, 0x1F5
+    mov eax, ebx ; Restore the backup LBA
+    shr eax, 16
+    out dx, al
+    ; Finished sending upper 16 bits of the LBA
 
-    mov dx,0x1F7
-    mov al,0x20
-    out dx,al
+    mov dx, 0x1f7
+    mov al, 0x20
+    out dx, al
 
-    ;read all sectors:
+    ; Read all sectors into memory
 .next_sector:
     push ecx
-;check if we need to read
+
+; Checking if we need to read
 .try_again:
-mov dx,0x1F7
-in al,dx
-test al,8
-jz .try_again
+    mov dx, 0x1f7
+    in al, dx
+    test al, 8
+    jz .try_again
 
-; we need to read 256 words at a time
-mov ecx,256
-mov dx,0x1F0
-rep insw    ; read from port 0x1f0 and write to locn at edi register
-; rep means repeat 256 times [512 bytes]
-pop ecx
-loop .next_sector
-; end of reading sectors
-
-ret
+; We need to read 256 words at a time
+    mov ecx, 256
+    mov dx, 0x1F0
+    rep insw
+    pop ecx
+    loop .next_sector
+    ; End of reading sectors into memory
+    ret
 
 times 510-($ - $$) db 0
-dw 0xaa55
+dw 0xAA55
