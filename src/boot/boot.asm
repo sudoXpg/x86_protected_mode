@@ -56,7 +56,7 @@ gdt_end:
         dw gdt_end-gdt_start-1
         dd gdt_start
 
-[bits 32]
+[BITS 32]
 load32:
     mov eax,1 ; start sector to load from
     mov ecx,100 ; total num of sectors to load

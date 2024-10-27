@@ -1,5 +1,6 @@
 [BITS 32]
 global _start   ; for symbol to be global for obj files
+extern kernel_main ; use the c function
 CODE_SEG equ 0x08
 DATA_SEG equ 0x10
 _start:
@@ -15,6 +16,7 @@ _start:
     in al, 0x92
     or al, 2
     out 0x92, al
+    call kernel_main
     jmp $
 
 times 512-($ - $$) db 0
