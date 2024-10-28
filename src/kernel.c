@@ -70,6 +70,5 @@ void kernel_main(){
     print("Hello World!\nFirst program!");
     idt_init(); //initialise the interrupts
 
-    outb(0x60,0xff);
 
 }

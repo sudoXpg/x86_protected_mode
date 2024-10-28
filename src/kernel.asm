@@ -22,6 +22,26 @@ _start:
     or al, 2
     out 0x92, al
 
+    ; start remap the master PIC
+    mov al,00010001b    ; keep PIC in initialisation mode
+    out 0x20,al         ; tell master PIC to start initialisation mode
+
+    mov al,0x20         ; interrupt 0x20 is where master ISR should start
+    
+    out 0x21,al
+
+    mov al,00000001b    ; finish init
+    out 0x21,al
+
+    ; 0x20 => master PIC [command]
+    ; 0x21 => master PIC [data]
+
+    ; since we have mapped IRQ to 20 , IRQ 1 = 20+1= int 21
+
+    ; end remap master PIC
+    
+    ; enable interrupts
+    sti
     call kernel_main
 
     jmp $
