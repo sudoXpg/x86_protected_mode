@@ -1,5 +1,6 @@
 #include "kernel.h"
 #include "idt/idt.h"
+#include "io/io.h"
 
 #include <stdint.h>
 #include<stddef.h>
@@ -63,13 +64,12 @@ void print(const char* str){
 }
 
 
-//extern void problem();    // test the div by zero code
-
 void kernel_main(){
 
     terminal_initialise();
     print("Hello World!\nFirst program!");
     idt_init(); //initialise the interrupts
-    //problem();
+
+    outb(0x60,0xff);
 
 }
