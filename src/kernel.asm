@@ -2,6 +2,7 @@
 
 global _start   ; for symbol to be global for obj files
 extern kernel_main  ; use the c function
+;global problem
 
 CODE_SEG equ 0x08
 DATA_SEG equ 0x10
@@ -24,5 +25,10 @@ _start:
     call kernel_main
 
     jmp $
+
+
+; problem:      // div by zero problem
+;     mov eax,0
+;     div eax
 
 times 512-($ - $$) db 0

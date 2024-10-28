@@ -1,4 +1,5 @@
 #include "kernel.h"
+#include "idt/idt.h"
 
 #include <stdint.h>
 #include<stddef.h>
@@ -62,13 +63,13 @@ void print(const char* str){
 }
 
 
-
+//extern void problem();    // test the div by zero code
 
 void kernel_main(){
-    //video_mem[0]=0x0341; // small endian system !
-    //video_mem[0]=terminal_make_char('B',14);    
 
     terminal_initialise();
     print("Hello World!\nFirst program!");
+    idt_init(); //initialise the interrupts
+    //problem();
 
 }
