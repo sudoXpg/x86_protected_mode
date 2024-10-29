@@ -46,6 +46,6 @@ void idt_init(){
     }
 
     idt_set(0,idt_zero);    // stores the address from the name of fxn
-    //idt_set(0x21,int21h);
+    idt_set(0x21,int21h);
     idt_load(&idtr_descriptor);  // pass to the asm code
 }

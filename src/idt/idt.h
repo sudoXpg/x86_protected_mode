@@ -3,7 +3,8 @@
 #include<stdint.h>
 
 void idt_init();
-
+extern void enable_interrupts();
+extern void disable_interrupts();
 struct idt_desc{
     
     uint16_t offset_1;    // offset bits 0-15

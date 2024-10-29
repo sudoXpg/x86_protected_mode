@@ -40,8 +40,9 @@ _start:
 
     ; end remap master PIC
     
-    ; enable interrupts
-    sti
+    ; quite dangerous to do this since idt not enabled yet so the system could panic !!
+    ;sti
+         
     call kernel_main
 
     jmp $
