@@ -3,7 +3,7 @@
 #include "io/io.h"
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
-
+#include "disk/disk.h"
 
 #include <stdint.h>
 #include<stddef.h>
@@ -89,4 +89,7 @@ void kernel_main(){
     enable_paging();
 // enable interrupts
     enable_interrupts();
+
+   char buff[512];
+   disk_read_sector(0,1,buff);
 }

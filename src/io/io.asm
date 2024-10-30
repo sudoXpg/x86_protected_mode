@@ -1,7 +1,7 @@
 section .asm
 
-global isnb
-global isnw
+global insb
+global insw
 global outb
 global outw
 
