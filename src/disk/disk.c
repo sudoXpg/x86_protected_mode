@@ -1,4 +1,11 @@
 #include "io/io.h"
+#include "disk.h"
+#include "../memory/memory.h"
+#include "../status.h"
+#include "../config.h"
+struct disk disk;
+
+
 int disk_read_sector(int lba, int total, void *buff){   // buffer is ehere data is loaded
     
     // process of reading from disk
@@ -25,4 +32,25 @@ int disk_read_sector(int lba, int total, void *buff){   // buffer is ehere data 
         }
     }
     return 0;
+}
+
+
+void disk_search_init(){        // only dealing with one disk atm
+    memset(&disk,0,sizeof(disk));
+    disk.type=AeOS_DISK_TYPE_REAL;
+    disk.sector_size=AeOS_SECTOR_SIZE;
+}
+
+struct disk *disk_get(int index){
+    if(index!=0){   // since only implementing one disk
+        return 0;
+    }
+    return &disk;
+}
+
+int disk_read_block(struct disk *idisk, unsigned int lba, int total, void *buff){
+    if(idisk!=&disk){       // since only one disk read for now
+        return -EIO;
+    }
+    return disk_read_sector(lba, total, buff);
 }

@@ -78,6 +78,9 @@ void kernel_main(){
 // initialise heap
     kheap_init();
 
+// search and initialise the disks
+    disk_search_init();
+
 //initialise the interrupts
     idt_init(); 
 
@@ -90,6 +93,4 @@ void kernel_main(){
 // enable interrupts
     enable_interrupts();
 
-   char buff[512];
-   disk_read_sector(0,1,buff);
 }
