@@ -2,6 +2,8 @@
     "files.associations": {
         "*.asm": "asm-intel-x86-generic",
         "kernel.h": "c",
-        "heap.h": "c"
+        "heap.h": "c",
+        "kheap.h": "c",
+        "stdint.h": "c"
     }
 }
