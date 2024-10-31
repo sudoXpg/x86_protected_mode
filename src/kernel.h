@@ -23,6 +23,7 @@
 
 void print(const char* str);
 void kernel_main();
+void panic(const char *msg);
 
 
 
