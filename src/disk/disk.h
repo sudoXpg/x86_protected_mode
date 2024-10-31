@@ -4,10 +4,12 @@
 #define AeOS_SECTOR_SIZE 512    // sector size of a normal hdd 
 #define AeOS_DISK_TYPE_REAL 0   // represents a real physical harddisk
 typedef unsigned int AeOS_DISK_TYPE;
+#include "../fs/file.h"
 
 struct disk{
     AeOS_DISK_TYPE type;
     int sector_size;
+    struct filesystem * filesystem; // file system binded to the disk
 };
 
 

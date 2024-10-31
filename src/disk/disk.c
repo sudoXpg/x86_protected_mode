@@ -39,6 +39,7 @@ void disk_search_init(){        // only dealing with one disk atm
     memset(&disk,0,sizeof(disk));
     disk.type=AeOS_DISK_TYPE_REAL;
     disk.sector_size=AeOS_SECTOR_SIZE;
+    disk.filesystem =fs_resolve(&disk);
 }
 
 struct disk *disk_get(int index){
