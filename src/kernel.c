@@ -4,6 +4,9 @@
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
 #include "disk/disk.h"
+#include "string/string.h"
+#include "fs/pparser.h"
+#include "disk/streamer.h"
 
 #include <stdint.h>
 #include<stddef.h>
@@ -15,13 +18,6 @@ uint16_t * video_mem =0;   // create ptr to abs address in memory
 uint16_t terminal_row ;
 uint16_t terminal_col ;
 
-size_t strlen(const char* str){
-    size_t len=0;
-    while(str[len]){
-        len++;
-    }
-    return len;
-}
 
 
 uint16_t terminal_make_char(char c, char color){
@@ -73,7 +69,7 @@ void kernel_main(){
 
 // initialise display
     terminal_initialise();
-    print("Hello World!\n");
+    print(AeOS_LOGO);
 
 // initialise heap
     kheap_init();
@@ -93,4 +89,13 @@ void kernel_main(){
 // enable interrupts
     enable_interrupts();
 
+// streamer 
+    struct disk_stream* stream = disk_streamer_new(0);
+    diskstream_seek(stream, 0x201);
+    unsigned char c = 0;
+    diskstreamer_read(stream, &c, 1);
+    int i;
+    while(1){
+        i++;
+    }
 }

@@ -4,12 +4,37 @@ BITS 16
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
 
-_start:
-    jmp short start
-    nop
 
- times 33 db 0
- 
+jmp short start
+nop
+
+; remove the redundant data and implement the header
+; FAT 16 Header
+
+OEMIdentifier           db 'AeOS    '
+BytesPerSector          dw 0x200    ; 512 bytes per sector [ignored by kernel]
+SectorPerCluster        db 0x80     ; sectors in a cluster
+ReservedSectors         dw 200      ; 200 reserved sectors \\ where the kernel would be
+FATCopies               db 0x02     ; number of FAT tables(+copies)
+RootDirEntries          dw 0x40     ; number of root directory entries
+NumSectors              dw 0x00
+MediaType               db 0xF8
+SectorsPerFat           dw 0x100
+SectorPerTrack          dw 0x20
+NumberOfHeads           dw 0x40
+HiddenSectors           dd 0x00
+SectorsBig              dd 0x773594
+
+; Extended BPB (DOS 4.0)
+DriveNumber             db 0x80
+WinNTBit                db 0x00
+Signature               db 0x29
+VolumeID                dd 0xD105
+VolumeIDString          db 'AeOS  BOOT '    ;; has to be 11 bytes or WONT WORK!
+SystemIDString          db 'FAT16   '
+
+
+
 start:
     jmp 0:step2
 

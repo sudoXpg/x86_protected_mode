@@ -4,6 +4,9 @@
         "kernel.h": "c",
         "heap.h": "c",
         "kheap.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "pparser.h": "c",
+        "string.h": "c",
+        "streamer.h": "c"
     }
 }

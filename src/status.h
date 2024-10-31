@@ -5,6 +5,7 @@
 #define EIO 1   // error code
 #define EINVARG 2 // invalid arg error
 #define ENOMEM 3 // memory not available
+#define EBADPATH 4 // path error
 
 
 #endif
